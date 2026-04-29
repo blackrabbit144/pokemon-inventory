@@ -35,6 +35,7 @@ export default function PacksPage() {
         <nav className="header-nav">
           <span className="nav-active">확장팩</span>
           <Link to="/logs" className="nav-link">재고 로그</Link>
+          <Link to="/photos" className="nav-link">사진 기록</Link>
         </nav>
       </header>
 

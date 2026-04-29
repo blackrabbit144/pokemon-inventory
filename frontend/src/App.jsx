@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import PacksPage from './pages/PacksPage';
 import LogPage from './pages/LogPage';
+import PhotoPage from './pages/PhotoPage';
 
 function PrivateRoute({ children }) {
   const token = localStorage.getItem('access_token');
@@ -26,6 +27,14 @@ export default function App() {
           element={
             <PrivateRoute>
               <LogPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/photos"
+          element={
+            <PrivateRoute>
+              <PhotoPage />
             </PrivateRoute>
           }
         />

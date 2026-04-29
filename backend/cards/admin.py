@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ExpansionPack, InventoryLog
+from .models import ExpansionPack, InventoryLog, PhotoRecord
 
 
 @admin.register(ExpansionPack)
@@ -17,3 +17,10 @@ class InventoryLogAdmin(admin.ModelAdmin):
     list_filter = ('action', 'location', 'from_location', 'to_location')
     search_fields = ('pack__name',)
     ordering = ('-timestamp',)
+
+
+@admin.register(PhotoRecord)
+class PhotoRecordAdmin(admin.ModelAdmin):
+    list_display = ('id', 'location', 'created_at', 'image_url')
+    list_filter = ('location',)
+    ordering = ('-created_at',)

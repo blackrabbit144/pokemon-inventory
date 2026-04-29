@@ -47,7 +47,10 @@ export default function LogPage() {
       <header className="log-header">
         <div className="log-header-inner">
           <h1 className="log-header-title">재고 로그</h1>
-          <Link to="/" className="log-back-btn">← 목록으로</Link>
+          <div style={{display:'flex', gap:'8px'}}>
+            <Link to="/" className="log-back-btn">확장팩</Link>
+            <Link to="/photos" className="log-back-btn">사진 기록</Link>
+          </div>
         </div>
       </header>
 

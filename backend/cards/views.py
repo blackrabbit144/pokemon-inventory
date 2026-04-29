@@ -3,8 +3,11 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.db import transaction
-from .models import ExpansionPack, InventoryLog
-from .serializers import ExpansionPackSerializer, InventoryLogSerializer
+import boto3
+import uuid
+import os
+from .models import ExpansionPack, InventoryLog, PhotoRecord
+from .serializers import ExpansionPackSerializer, InventoryLogSerializer, PhotoRecordSerializer
 
 LOCATION_FIELD = {
     'gwangju': 'qty_gwangju',
@@ -107,3 +110,38 @@ class InventoryLogViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = InventoryLog.objects.select_related('pack').all()
     serializer_class = InventoryLogSerializer
     permission_classes = [IsAuthenticated]
+
+
+class PhotoRecordViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = PhotoRecord.objects.all()
+    serializer_class = PhotoRecordSerializer
+    permission_classes = [IsAuthenticated]
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def photo_upload(request):
+    file = request.FILES.get('file')
+    location = request.data.get('location')
+
+    if not file:
+        return Response({'error': '파일을 선택해주세요.'}, status=400)
+    if location not in LOCATION_FIELD:
+        return Response({'error': '올바른 위치를 선택해주세요.'}, status=400)
+
+    ext = file.name.rsplit('.', 1)[-1].lower()
+    key = f"photos/{uuid.uuid4().hex}.{ext}"
+    bucket = os.getenv('AWS_S3_BUCKET')
+    region = os.getenv('AWS_S3_REGION', 'ap-northeast-2')
+
+    s3 = boto3.client(
+        's3',
+        aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+        aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+        region_name=region,
+    )
+    s3.upload_fileobj(file, bucket, key, ExtraArgs={'ContentType': file.content_type})
+
+    image_url = f"https://{bucket}.s3.{region}.amazonaws.com/{key}"
+    photo = PhotoRecord.objects.create(image_url=image_url, location=location)
+    return Response(PhotoRecordSerializer(photo).data, status=201)
