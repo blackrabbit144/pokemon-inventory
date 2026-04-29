@@ -72,6 +72,21 @@
   font-weight: 600;
 }
 
+.header-nav .nav-link {
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0.75;
+  border-bottom: 3px solid transparent;
+  text-decoration: none;
+  color: #fff;
+  transition: opacity 0.2s;
+}
+
+.header-nav .nav-link:hover {
+  opacity: 1;
+}
+
 /* グリッド */
 .packs-main {
   max-width: 1200px;
