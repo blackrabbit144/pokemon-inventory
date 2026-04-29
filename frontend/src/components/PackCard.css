@@ -82,9 +82,10 @@
 .inv-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 5px 8px;
+  gap: 6px;
+  padding: 5px 6px;
   border-radius: 8px;
+  min-width: 0;
 }
 
 .loc-gwangju { background: #e8f5e9; }
@@ -113,20 +114,22 @@
 
 .inv-actions {
   display: flex;
-  gap: 4px;
+  gap: 3px;
+  flex-shrink: 0;
 }
 
 .inv-btn {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   border: none;
   border-radius: 6px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   transition: opacity 0.15s;
   padding: 0;
   line-height: 1;
@@ -138,8 +141,8 @@
 .inv-btn:active { opacity: 0.55; transform: scale(0.93); }
 
 .inv-btn-add      { background: #4caf50; color: #fff; }
-.inv-btn-remove   { background: #ef5350; color: #fff; font-size: 20px; }
-.inv-btn-transfer { background: #7c9cbf; color: #fff; font-size: 13px; }
+.inv-btn-remove   { background: #ef5350; color: #fff; font-size: 18px; }
+.inv-btn-transfer { background: #7c9cbf; color: #fff; font-size: 12px; }
 
 .inv-total {
   display: flex;
