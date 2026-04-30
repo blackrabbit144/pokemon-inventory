@@ -112,12 +112,44 @@
   aspect-ratio: 1 / 1;
   overflow: hidden;
   background: #f0f0f0;
+  position: relative;
 }
 
 .photo-img-wrap img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.photo-delete-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.photo-card:hover .photo-delete-btn {
+  opacity: 1;
+}
+
+/* スマホは常に表示 */
+@media (hover: none) {
+  .photo-delete-btn {
+    opacity: 1;
+  }
 }
 
 .photo-card-info {
@@ -280,6 +312,44 @@
 }
 
 .photo-modal-confirm:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.photo-modal-desc {
+  font-size: 14px;
+  color: #555;
+  margin: 0 0 14px;
+}
+
+.photo-delete-preview-wrap {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  background: #f0f0f0;
+}
+
+.photo-delete-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-modal-delete {
+  flex: 1;
+  padding: 11px;
+  background: #e53935;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.photo-modal-delete:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }

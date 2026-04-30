@@ -20,11 +20,13 @@ function formatDateTime(isoStr) {
 export default function PhotoPage() {
   const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [modal, setModal] = useState(false);
+  const [uploadModal, setUploadModal] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null); // photo object
   const [location, setLocation] = useState('gwangju');
   const [preview, setPreview] = useState(null);
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
   const fileInputRef = useRef(null);
 
@@ -35,16 +37,16 @@ export default function PhotoPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const openModal = () => {
-    setModal(true);
+  const openUpload = () => {
+    setUploadModal(true);
     setFile(null);
     setPreview(null);
     setLocation('gwangju');
     setError('');
   };
 
-  const closeModal = () => {
-    setModal(false);
+  const closeUpload = () => {
+    setUploadModal(false);
     setPreview(null);
     setFile(null);
     setError('');
@@ -69,11 +71,25 @@ export default function PhotoPage() {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setPhotos((prev) => [res.data, ...prev]);
-      closeModal();
+      closeUpload();
     } catch (e) {
       setError(e.response?.data?.error || '업로드 중 오류가 발생했습니다.');
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await api.post(`/photos/${deleteTarget.id}/delete/`);
+      setPhotos((prev) => prev.filter((p) => p.id !== deleteTarget.id));
+      setDeleteTarget(null);
+    } catch {
+      // ignore
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -84,7 +100,7 @@ export default function PhotoPage() {
       <header className="photo-header">
         <div className="photo-header-inner">
           <h1 className="photo-header-title">제품 정보</h1>
-          <button className="photo-upload-btn" onClick={openModal}>+ 사진 업로드</button>
+          <button className="photo-upload-btn" onClick={openUpload}>+ 사진 업로드</button>
         </div>
         <nav className="photo-header-nav">
           <Link to="/" className="photo-nav-link">확장팩</Link>
@@ -106,6 +122,11 @@ export default function PhotoPage() {
                 <div key={photo.id} className="photo-card">
                   <div className="photo-img-wrap">
                     <img src={photo.image_url} alt={photo.location_display} loading="lazy" />
+                    <button
+                      className="photo-delete-btn"
+                      onClick={() => setDeleteTarget(photo)}
+                      title="삭제"
+                    >✕</button>
                   </div>
                   <div className="photo-card-info">
                     <span className={`photo-loc-badge ${loc?.colorClass}`}>
@@ -120,15 +141,12 @@ export default function PhotoPage() {
         )}
       </main>
 
-      {modal && (
-        <div className="photo-modal-overlay" onClick={closeModal}>
+      {/* Upload modal */}
+      {uploadModal && (
+        <div className="photo-modal-overlay" onClick={closeUpload}>
           <div className="photo-modal-box" onClick={(e) => e.stopPropagation()}>
             <h3 className="photo-modal-title">사진 업로드</h3>
-
-            <div
-              className="photo-drop-zone"
-              onClick={() => fileInputRef.current?.click()}
-            >
+            <div className="photo-drop-zone" onClick={() => fileInputRef.current?.click()}>
               {preview ? (
                 <img src={preview} alt="preview" className="photo-preview" />
               ) : (
@@ -145,7 +163,6 @@ export default function PhotoPage() {
               style={{ display: 'none' }}
               onChange={handleFileChange}
             />
-
             <div className="photo-modal-field">
               <label>장소</label>
               <div className="photo-loc-btns">
@@ -160,13 +177,30 @@ export default function PhotoPage() {
                 ))}
               </div>
             </div>
-
             {error && <p className="photo-modal-error">{error}</p>}
-
             <div className="photo-modal-btns">
-              <button className="photo-modal-cancel" onClick={closeModal}>취소</button>
+              <button className="photo-modal-cancel" onClick={closeUpload}>취소</button>
               <button className="photo-modal-confirm" onClick={handleUpload} disabled={uploading}>
                 {uploading ? '업로드 중...' : '업로드'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete confirm modal */}
+      {deleteTarget && (
+        <div className="photo-modal-overlay" onClick={() => setDeleteTarget(null)}>
+          <div className="photo-modal-box" onClick={(e) => e.stopPropagation()}>
+            <h3 className="photo-modal-title">사진 삭제</h3>
+            <p className="photo-modal-desc">이 사진을 삭제하시겠습니까?</p>
+            <div className="photo-delete-preview-wrap">
+              <img src={deleteTarget.image_url} alt="" className="photo-delete-preview" />
+            </div>
+            <div className="photo-modal-btns">
+              <button className="photo-modal-cancel" onClick={() => setDeleteTarget(null)}>취소</button>
+              <button className="photo-modal-delete" onClick={handleDelete} disabled={deleting}>
+                {deleting ? '삭제 중...' : '삭제'}
               </button>
             </div>
           </div>

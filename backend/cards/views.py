@@ -113,7 +113,7 @@ class InventoryLogViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class PhotoRecordViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = PhotoRecord.objects.all()
+    queryset = PhotoRecord.objects.filter(deleted_at__isnull=True)
     serializer_class = PhotoRecordSerializer
     permission_classes = [IsAuthenticated]
 
@@ -148,3 +148,16 @@ def photo_upload(request):
     image_url = f"https://{bucket}.s3.{region}.amazonaws.com/{key}"
     photo = PhotoRecord.objects.create(image_url=image_url, location=location)
     return Response(PhotoRecordSerializer(photo).data, status=201)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def photo_delete(request, pk):
+    from django.utils import timezone
+    try:
+        photo = PhotoRecord.objects.get(pk=pk, deleted_at__isnull=True)
+    except PhotoRecord.DoesNotExist:
+        return Response({'error': '사진을 찾을 수 없습니다.'}, status=404)
+    photo.deleted_at = timezone.now()
+    photo.save()
+    return Response({'success': True})
