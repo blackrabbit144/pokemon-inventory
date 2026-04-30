@@ -12,9 +12,9 @@ router.register(r'logs', InventoryLogViewSet)
 router.register(r'photos', PhotoRecordViewSet)
 
 urlpatterns = [
-    path('', include(router.urls)),
     path('inventory/add/', inventory_add),
     path('inventory/remove/', inventory_remove),
     path('inventory/transfer/', inventory_transfer),
     path('photos/upload/', photo_upload),
+    path('', include(router.urls)),
 ]
