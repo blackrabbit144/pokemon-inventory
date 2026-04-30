@@ -140,7 +140,10 @@ def photo_upload(request):
         aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
         region_name=region,
     )
-    s3.upload_fileobj(file, bucket, key, ExtraArgs={'ContentType': file.content_type})
+    try:
+        s3.upload_fileobj(file, bucket, key, ExtraArgs={'ContentType': file.content_type})
+    except Exception as e:
+        return Response({'error': f'S3 업로드 실패: {str(e)}'}, status=500)
 
     image_url = f"https://{bucket}.s3.{region}.amazonaws.com/{key}"
     photo = PhotoRecord.objects.create(image_url=image_url, location=location)
